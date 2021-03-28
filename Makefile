@@ -4,8 +4,8 @@ run:
 test:
 	poetry run pytest .
 
-flake:
-	flake8 discord-bot-the-eternal-gem/ tests/
+lint:
+	poetry run flake8 discord_bot_the_eternal_gem/ tests/
 
 image:
 	docker build -t ghcr.io/lesteenman/discord-bot-the-eternal-gem:local .

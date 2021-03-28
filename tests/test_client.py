@@ -1,5 +1,5 @@
 from abc import ABC
-from unittest.mock import PropertyMock, patch, Mock, AsyncMock
+from unittest.mock import PropertyMock, patch, AsyncMock
 
 import discord
 import pytest
