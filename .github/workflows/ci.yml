@@ -14,10 +14,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
+
     - name: Install Poetry
       uses: snok/install-poetry@v1.1.2
       with:
@@ -34,7 +36,7 @@ jobs:
     - name: Install dependencies
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       run: poetry install --no-interaction --no-root
-    
+
     - name: Install library
       run: poetry install --no-interaction
 
@@ -43,4 +45,3 @@ jobs:
 
     - name: Lint with flake8
       run: poetry run flake8 tests discord_bot_the_eternal_gem
-    - name: Test with pytest
