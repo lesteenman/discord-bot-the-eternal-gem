@@ -19,6 +19,7 @@ jobs:
       - name: Build container image
         uses: docker/build-push-action@v2
         with:
+          context: .
           push: true
           tags: ghcr.io/lesteenman/discord-bot-the-eternal-gem:latest
 
