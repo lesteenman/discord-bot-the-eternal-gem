@@ -13,12 +13,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v2
+      - name: Build container image
+        uses: docker/build-push-action@v1
         with:
-          push: true
-          tags: discord-bot-the-eternal-gem:latest
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: ${{ github.repository }}/image
+          tag_with_sha: true
+          tag_with_ref: true
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
