@@ -8,8 +8,8 @@ if discord_token is None:
         discord_token = discord_token_file.read()
 
 client = TheEternalGemClient()
-client.configure_guild(guild_id=800097373681746011,
-                       welcome_channel=825656911843295283,
-                       guest_role=825657018428948520)
+client.configure_guild(guild_id=os.environ.get('DISCORD_GUILD', 800097373681746011),
+                       welcome_channel=os.environ.get('DISCORD_WELCOME_CHANNEL', 825656911843295283),
+                       guest_role=os.environ.get('DISCORD_GUEST_ROLE', 825657018428948520))
 
 client.run(discord_token)
