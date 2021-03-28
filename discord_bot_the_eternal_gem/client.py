@@ -12,17 +12,18 @@ class TheEternalGemClient(discord.Client):
             self.guild_configs[guild_id] = {}
 
         if welcome_channel is not None:
-            self.guild_configs[guild_id]['welcome_channel'] = welcome_channel
+            self.guild_configs[guild_id]['welcome_channel'] = int(welcome_channel)
 
         if guest_role is not None:
-            self.guild_configs[guild_id]['guest_role'] = guest_role
+            self.guild_configs[guild_id]['guest_role'] = int(guest_role)
 
     async def on_ready(self):
         log.info(f"We have logged in as {self.user}")
+        log.info("Guild configs:")
+        for guild_id, guild_config in self.guild_configs.items():
+            log.info(f"{guild_id} => {guild_config}")
 
     async def on_message(self, message):
-        log.debug(f"on_message for {message.content}")
-
         for guild_id, guild_config in self.guild_configs.items():
             if guild_config['welcome_channel'] == message.channel.id:
                 log.info(f"welcome message found for guild {guild_id}.")
@@ -32,11 +33,23 @@ class TheEternalGemClient(discord.Client):
                 discord_name = message.author.name
                 osrs_name = message.content
                 new_nick = await self.generate_nick(discord_name, osrs_name)
-                await message.author.edit(nick=new_nick)
-                await message.delete()
+                log.info(f"new nick will be {new_nick}.")
 
-                guest_role = next(role for role in message.guild.roles if role.id == guild_config['guest_role'])
-                await message.author.add_roles(guest_role)
+                try:
+                    log.debug("changing nickname...")
+                    await message.author.edit(nick=new_nick)
+                    log.debug("nickname changed.")
+
+                    log.debug("deleting message...")
+                    await message.delete()
+                    log.debug("message deleted.")
+
+                    log.debug("adding guest role...")
+                    guest_role = next(role for role in message.guild.roles if role.id == guild_config['guest_role'])
+                    await message.author.add_roles(guest_role)
+                    log.debug("guest role added.")
+                except Exception as e:
+                    log.error(e)
 
     async def generate_nick(self, discord_name, osrs_name):
         if len(discord_name) > 25:
