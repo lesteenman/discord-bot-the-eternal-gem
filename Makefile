@@ -6,3 +6,6 @@ test:
 
 flake:
 	flake8 discord-bot-the-eternal-gem/ tests/
+
+image:
+	docker build -t discord-bot-the-eternal-gem:local .
