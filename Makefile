@@ -8,4 +8,4 @@ flake:
 	flake8 discord-bot-the-eternal-gem/ tests/
 
 image:
-	docker build -t discord-bot-the-eternal-gem:local .
+	docker build -t ghcr.io/lesteenman/discord-bot-the-eternal-gem:local .
