@@ -6,6 +6,7 @@ import pytest
 
 import discord_bot_the_eternal_gem
 from discord_bot_the_eternal_gem.client import TheEternalGemClient
+from discord_bot_the_eternal_gem.message_responder import MessageResponder
 
 pytestmark = pytest.mark.asyncio
 
@@ -57,11 +58,10 @@ async def test_message_in_welcome_channel_changes_nick(mock_discord, discord_nam
 
     fake_guild = FakeGuild(roles=[guest_role])
 
-    client = TheEternalGemClient(welcome_channel=welcome_channel_id)
+    client = TheEternalGemClient()
     client.configure_guild(guild_id, welcome_channel=welcome_channel_id, guest_role=guest_role_id)
 
     mock_user = make_mock_user(discord_name)
-    # mock_user.edit.return_value = AsyncMock()
     message = FakeMessage(channel=FakeChannel(welcome_channel_id), content=osrs_name, author=mock_user,
                           guild=fake_guild)
 
@@ -72,6 +72,28 @@ async def test_message_in_welcome_channel_changes_nick(mock_discord, discord_nam
     mock_user.edit.assert_called_with(nick=expected_nick)
     mock_user.add_roles.assert_called_with(guest_role)
     assert message.deleted
+
+
+async def test_message_responder():
+    # Given
+    client = TheEternalGemClient()
+    guild_id = 10
+
+    message_responder = AsyncMock(MessageResponder)
+
+    client.configure_guild(guild_id, message_responder=message_responder)
+    fake_channel = FakeChannel(channel_id=10)
+
+    # When
+    message = FakeMessage(
+        content="Hello team!",
+        channel=fake_channel,
+        author=make_mock_user("user1"),
+        guild=FakeGuild(roles=[]))
+    await client.on_message(message)
+
+    # Then
+    message_responder.handle_message.assert_called_with(message="Hello team!", channel=fake_channel)
 
 
 def make_mock_user(discord_name: str = "discord-name"):
