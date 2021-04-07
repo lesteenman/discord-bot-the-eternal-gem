@@ -8,4 +8,7 @@ lint:
 	poetry run flake8 discord_bot_the_eternal_gem/ tests/
 
 image:
-	docker build -t ghcr.io/lesteenman/discord-bot-the-eternal-gem:local .
+	docker build -t ghcr.io/lesteenman/discord-bot-the-eternal-gem .
+
+push: image
+	docker push ghcr.io/lesteenman/discord-bot-the-eternal-gem:latest

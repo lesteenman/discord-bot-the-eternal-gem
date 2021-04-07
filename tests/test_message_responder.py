@@ -10,10 +10,11 @@ from discord_bot_the_eternal_gem.message_responder import MessageResponder
 pytestmark = pytest.mark.asyncio
 
 
-async def test_handle_matching_message():
+@pytest.mark.parametrize("message", ['Eternal Gem', 'eternal gem', 'eternal Gem'])
+async def test_handle_matching_message(message: str):
     # Given
     lookup = {
-        'Eternal Gem': 'The most awesome bot ever!'
+        'eternal gem': 'The most awesome bot ever!'
     }
     message_responder = MessageResponder(lookup)
 
@@ -21,7 +22,7 @@ async def test_handle_matching_message():
 
     # When
     await message_responder.handle_message(channel=channel,
-                                           message='Eternal Gem')
+                                           message=message)
 
     # Then
     channel.send.assert_called_with(content='The most awesome bot ever!')
@@ -30,7 +31,7 @@ async def test_handle_matching_message():
 async def test_handle_nonmatching_message():
     # Given
     lookup = {
-        'Eternal Gem': 'The most awesome bot ever!'
+        'eternal gem': 'The most awesome bot ever!'
     }
     message_responder = MessageResponder(lookup)
 
@@ -55,5 +56,5 @@ def test_initialize_from_file():
 
     # Then
     assert message_responder.lookup == {
-        'The Eternal Gem': 'The most awesome bot ever!'
+        'the eternal gem': 'The most awesome bot ever!'
     }

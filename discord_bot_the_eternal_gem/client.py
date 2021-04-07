@@ -30,7 +30,6 @@ class TheEternalGemClient(discord.Client):
             log.info(f"{guild_id} => {guild_config}")
 
     async def on_message(self, message):
-        log.debug(f"{message.author.name} said '{message.content}'")
         for guild_id, guild_config in self.guild_configs.items():
             if guild_config.get('welcome_channel', -1) == message.channel.id:
                 log.info(f"welcome message found for guild {guild_id}.")
