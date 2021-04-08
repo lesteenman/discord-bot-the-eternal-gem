@@ -21,7 +21,8 @@ async def test_handle_matching_message(message: str):
     channel = AsyncMock(discord.TextChannel, autospec=True)
 
     # When
-    await message_responder.handle_message(channel=channel,
+    await message_responder.handle_message(guild_id=-1,
+                                           channel=channel,
                                            message=message)
 
     # Then
@@ -38,7 +39,8 @@ async def test_handle_nonmatching_message():
     channel = AsyncMock(discord.TextChannel, autospec=True)
 
     # When
-    await message_responder.handle_message(channel=channel,
+    await message_responder.handle_message(guild_id=-1,
+                                           channel=channel,
                                            message='Something else')
 
     # Then

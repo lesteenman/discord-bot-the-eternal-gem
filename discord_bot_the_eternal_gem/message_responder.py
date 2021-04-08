@@ -7,7 +7,7 @@ class MessageResponder(object):
     def __init__(self, lookup: dict):
         self.lookup = lookup
 
-    async def handle_message(self, channel: discord.TextChannel, message: str):
+    async def handle_message(self, channel: discord.TextChannel, message: str, guild_id: int):
         if message.lower() in self.lookup:
             log.info(f"[channel={channel.id}] matched message '{message}', responding in channel")
             await channel.send(content=self.lookup.get(message.lower()))

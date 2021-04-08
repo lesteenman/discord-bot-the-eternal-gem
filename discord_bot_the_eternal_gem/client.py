@@ -1,16 +1,26 @@
+import typing
+
 import discord
 from loguru import logger as log
 
 from discord_bot_the_eternal_gem.message_responder import MessageResponder
+from discord_bot_the_eternal_gem.welcomer import Welcomer
 
 
 class TheEternalGemClient(discord.Client):
-    def __init__(self, **options):
+    def __init__(self, welcomer: Welcomer, message_responder: MessageResponder, **options):
         super().__init__(**options)
+
+        log.debug("configuring TheEternalGemClient...")
+        log.debug(f"welcomer={welcomer}")
+        log.debug(f"message_responder={message_responder}")
+
+        self.welcomer = welcomer
+        self.message_responder = message_responder
+
         self.guild_configs = {}
 
-    def configure_guild(self, guild_id: int, welcome_channel: int = None,
-                        guest_role: int = None, message_responder: MessageResponder = None):
+    def configure_guild(self, guild_id: int, welcome_channel: int = None, guest_role: int = None):
         if guild_id not in self.guild_configs:
             self.guild_configs[guild_id] = {}
 
@@ -20,26 +30,35 @@ class TheEternalGemClient(discord.Client):
         if guest_role is not None:
             self.guild_configs[guild_id]['guest_role'] = int(guest_role)
 
-        if message_responder is not None:
-            self.guild_configs[guild_id]['message_responder'] = message_responder
-
     async def on_ready(self):
         log.info(f"We have logged in as {self.user}")
         log.info("Guild configs:")
         for guild_id, guild_config in self.guild_configs.items():
             log.info(f"{guild_id} => {guild_config}")
 
-    async def on_message(self, message):
+    async def on_message(self, message: discord.Message):
+        log.debug(f"received message '{message.content}' from author '{message.author.id}'")
+        if message.author.id == self.user.id:
+            log.debug("aborting own message.")
+            return
+
         for guild_id, guild_config in self.guild_configs.items():
-            if guild_config.get('welcome_channel', -1) == message.channel.id:
-                log.info(f"welcome message found for guild {guild_id}.")
-                await self.handle_welcome_channel_message(guild_config, message)
-            elif guild_config.get('message_responder', None) is not None:
-                message_responder = guild_config.get('message_responder', None)
-                await message_responder.handle_message(
-                    channel=message.channel,
-                    message=message.content,
-                )
+            if guild_id == message.guild.id:
+                await self.handle_message(guild_config, guild_id, message)
+
+    async def handle_message(self, guild_config: typing.Dict, guild_id: int, message: discord.Message):
+        welcome_channel = guild_config.get('welcome_channel', -1)
+        log.debug(f"checking if message {message.channel.id} was from welcome channel {welcome_channel}")
+        if welcome_channel == message.channel.id:
+            log.info(f"welcome message found for guild {guild_id}.")
+            guest_role_id = guild_config.get('guest_role', None)
+            await self.welcomer.handle_welcome_channel_message(message=message, guest_role_id=guest_role_id)
+        else:
+            await self.message_responder.handle_message(
+                guild_id=guild_id,
+                channel=message.channel,
+                message=message.content,
+            )
 
     async def handle_welcome_channel_message(self, guild_config, message):
         log.info(f"\tauthor={message.author.name}")
