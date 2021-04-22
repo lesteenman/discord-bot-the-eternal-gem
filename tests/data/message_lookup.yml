@@ -1,3 +1,11 @@
 lookup:
-  - message: 'The Eternal Gem'
-    response: 'The most awesome bot ever!'
+  - message: "The Eternal Gem"
+    response: "The most awesome bot ever!"
+  - messages:
+      - "Good bot"
+      - "Great bot"
+    response: "Thank you!"
+  - message: "Bad bot"
+    responses:
+      - "You know what?"
+      - "I don't like you either."

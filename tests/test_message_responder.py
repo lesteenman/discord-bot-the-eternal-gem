@@ -1,6 +1,6 @@
 import os
 import pathlib
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, call
 
 import discord
 import pytest
@@ -14,7 +14,7 @@ pytestmark = pytest.mark.asyncio
 async def test_handle_matching_message(message: str):
     # Given
     lookup = {
-        'eternal gem': 'The most awesome bot ever!'
+        'eternal gem': ['The most awesome bot ever!'],
     }
     message_responder = MessageResponder(lookup)
 
@@ -32,7 +32,7 @@ async def test_handle_matching_message(message: str):
 async def test_handle_nonmatching_message():
     # Given
     lookup = {
-        'eternal gem': 'The most awesome bot ever!'
+        'eternal gem': ['The most awesome bot ever!'],
     }
     message_responder = MessageResponder(lookup)
 
@@ -47,6 +47,30 @@ async def test_handle_nonmatching_message():
     channel.send.assert_not_called()
 
 
+async def test_handle_multiple_responses():
+    # Given
+    lookup = {
+        'eternal gem': [
+            'The most awesome bot ever!',
+            'There is none like it!'
+        ],
+    }
+    message_responder = MessageResponder(lookup)
+
+    channel = AsyncMock(discord.TextChannel, autospec=True)
+
+    # When
+    await message_responder.handle_message(guild_id=-1,
+                                           channel=channel,
+                                           message='eternal gem')
+
+    # Then
+    channel.send.assert_has_calls([
+        call(content='The most awesome bot ever!'),
+        call(content='There is none like it!'),
+    ])
+
+
 def test_initialize_from_file():
     # Given
     file = os.path.join(pathlib.Path(__file__).parent.absolute(),
@@ -58,5 +82,8 @@ def test_initialize_from_file():
 
     # Then
     assert message_responder.lookup == {
-        'the eternal gem': 'The most awesome bot ever!'
+        'the eternal gem': ['The most awesome bot ever!'],
+        'good bot': ['Thank you!'],
+        'great bot': ['Thank you!'],
+        'bad bot': ["You know what?", "I don't like you either."],
     }
