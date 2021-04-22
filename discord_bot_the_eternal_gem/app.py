@@ -1,13 +1,9 @@
 import os
 
 from discord_bot_the_eternal_gem.client import TheEternalGemClient
+from discord_bot_the_eternal_gem.config import get_discord_token
 from discord_bot_the_eternal_gem.message_responder import MessageResponder
 from discord_bot_the_eternal_gem.welcomer import Welcomer
-
-discord_token = os.environ.get('DISCORD_TOKEN')
-if discord_token is None:
-    with open('.discord-token', 'r') as discord_token_file:
-        discord_token = discord_token_file.read()
 
 message_responder = None
 message_responder_config = os.environ.get('MESSAGE_RESPONDER_CONFIG')
@@ -29,4 +25,4 @@ client.configure_guild(
     guest_role=guest_role,
 )
 
-client.run(discord_token)
+client.run(get_discord_token())
