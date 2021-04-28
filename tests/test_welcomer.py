@@ -40,5 +40,3 @@ async def test_message_in_welcome_channel_changes_nick(mock_discord, discord_nam
     mock_user.edit.assert_called_with(nick=expected_nick)
     mock_user.add_roles.assert_called_with(guest_role)
     assert message.deleted
-
-
