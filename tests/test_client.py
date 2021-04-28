@@ -1,4 +1,3 @@
-from unittest import mock
 from unittest.mock import PropertyMock, AsyncMock, patch
 
 import discord
@@ -89,7 +88,11 @@ async def test_message_responder(mock_client_user, guild_id: int, message_guild_
 
     # Then
     if is_guild_message:
-        message_responder.handle_message.assert_called_with(guild_id=guild_id, message="Hello team!", channel=fake_channel)
+        message_responder.handle_message.assert_called_with(
+            guild_id=guild_id,
+            message="Hello team!",
+            channel=fake_channel
+        )
     else:
         message_responder.handle_message.assert_not_called()
 
