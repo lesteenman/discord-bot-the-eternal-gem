@@ -26,7 +26,7 @@ class ClockChannelClient(discord.Client):
 
     async def wait_until_next_update_time(self):
         sleep_time = 30
-        print(f"sleeping for {sleep_time} seconds")
+        log.info(f"sleeping for {sleep_time} seconds")
         await asyncio.sleep(sleep_time)
 
     async def update_channel_name(self):
@@ -36,8 +36,8 @@ class ClockChannelClient(discord.Client):
         name = name_creator.name(time)
 
         if name == channel.name:
-            print(f"Name is still '{name}', not updating.")
+            log.info(f"Name is still '{name}', not updating.")
             return
 
-        print(f"updating channel name from {channel.name} to {name}")
+        log.info(f"updating channel name from {channel.name} to {name}")
         await channel.edit(name=name)

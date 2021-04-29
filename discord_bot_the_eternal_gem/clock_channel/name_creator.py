@@ -11,7 +11,7 @@ def name(time: datetime):
 
     emoji = emoji_lookup[hour % 12]
 
-    return f"{emoji} {hour}:{minutes} UTC"
+    return f"{emoji}  {hour}:{minutes} UTC"
 
 
 emoji_lookup = {
