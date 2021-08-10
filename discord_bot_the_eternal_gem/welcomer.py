@@ -1,16 +1,20 @@
+import typing
+
 import discord
 from loguru import logger as log
 
 
 class Welcomer:
-    async def handle_welcome_channel_message(self, message: discord.Message, guest_role_id: int):
+    async def handle_welcome_channel_message(self, message: discord.Message, guest_role_ids: typing.List[int]):
         new_nick = await self.generate_nick(message)
         log.info(f"new nick will be {new_nick}.")
 
         try:
             await self.change_nickname(message, new_nick)
             await self.delete_message(message)
-            await self.add_guest_role(guest_role_id, message)
+
+            for guest_role_id in guest_role_ids:
+                await self.add_guest_role(guest_role_id, message)
         except Exception as e:
             log.error(e)
 

@@ -1,5 +1,5 @@
 # A discord username must be at most 32 characters long.
-from unittest.mock import patch
+from unittest.mock import patch, call
 
 import pytest
 
@@ -34,9 +34,41 @@ async def test_message_in_welcome_channel_changes_nick(mock_discord, discord_nam
                           guild=fake_guild)
 
     # When
-    await welcomer.handle_welcome_channel_message(message=message, guest_role_id=guest_role_id)
+    await welcomer.handle_welcome_channel_message(message=message, guest_role_ids=[guest_role_id])
 
     # Then
     mock_user.edit.assert_called_with(nick=expected_nick)
     mock_user.add_roles.assert_called_with(guest_role)
     assert message.deleted
+
+
+@patch.object(discord_bot_the_eternal_gem.client, 'discord')
+async def test_message_in_welcome_channel_adds_all_guest_roles(mock_discord):
+    # Given
+    guest_role_id_1 = 300
+    guest_role_id_2 = 301
+    guest_role_id_3 = 302
+    guest_role_ids = [guest_role_id_1, guest_role_id_2, guest_role_id_3]
+
+    guest_role_1 = FakeRole(id=guest_role_id_1)
+    guest_role_2 = FakeRole(id=guest_role_id_2)
+    guest_role_3 = FakeRole(id=guest_role_id_3)
+    guest_roles = [guest_role_1, guest_role_2, guest_role_3]
+
+    fake_guild = FakeGuild(id=-1, roles=guest_roles)
+
+    welcomer = Welcomer()
+
+    mock_user = make_mock_user("discord_name")
+    message = FakeMessage(content="osrs_name", author=mock_user,
+                          guild=fake_guild)
+
+    # When
+    await welcomer.handle_welcome_channel_message(message=message, guest_role_ids=guest_role_ids)
+
+    # Then
+    mock_user.add_roles.assert_has_calls([
+        call(guest_role_1),
+        call(guest_role_2),
+        call(guest_role_3),
+    ])
