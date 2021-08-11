@@ -20,15 +20,15 @@ class TheEternalGemClient(discord.Client):
 
         self.guild_configs = {}
 
-    def configure_guild(self, guild_id: int, welcome_channel: int = None, guest_role: int = None):
+    def configure_guild(self, guild_id: int, welcome_channel: int = None, guest_roles: typing.List[int] = None):
         if guild_id not in self.guild_configs:
             self.guild_configs[guild_id] = {}
 
         if welcome_channel is not None:
             self.guild_configs[guild_id]['welcome_channel'] = int(welcome_channel)
 
-        if guest_role is not None:
-            self.guild_configs[guild_id]['guest_role'] = int(guest_role)
+        if guest_roles is not None:
+            self.guild_configs[guild_id]['guest_roles'] = [int(role) for role in guest_roles]
 
     async def on_ready(self):
         log.info(f"We have logged in as {self.user}")
@@ -51,8 +51,8 @@ class TheEternalGemClient(discord.Client):
         log.debug(f"checking if message {message.channel.id} was from welcome channel {welcome_channel}")
         if welcome_channel == message.channel.id:
             log.info(f"welcome message found for guild {guild_id}.")
-            guest_role_id = guild_config.get('guest_role', None)
-            await self.welcomer.handle_welcome_channel_message(message=message, guest_role_id=guest_role_id)
+            guest_roles = guild_config.get('guest_roles', None)
+            await self.welcomer.handle_welcome_channel_message(message=message, guest_role_ids=guest_roles)
         else:
             await self.message_responder.handle_message(
                 guild_id=guild_id,

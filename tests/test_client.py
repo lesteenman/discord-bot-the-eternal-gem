@@ -24,13 +24,14 @@ async def test_welcomer(mock_client_user, welcome_channel_id: int, message_chann
         message_responder=AsyncMock(MessageResponder),
     )
 
-    guest_role_id = 100
+    guest_role_id_1 = 100
+    guest_role_id_2 = 101
     guild_id = 10
 
     client.configure_guild(
         guild_id=guild_id,
         welcome_channel=welcome_channel_id,
-        guest_role=guest_role_id
+        guest_roles=[guest_role_id_1, guest_role_id_2]
     )
 
     mock_client_user.return_value = make_mock_user(user_id=100)
@@ -47,7 +48,12 @@ async def test_welcomer(mock_client_user, welcome_channel_id: int, message_chann
 
     # Then
     if is_welcome_message:
-        welcomer.handle_welcome_channel_message.assert_called_with(message=message, guest_role_id=guest_role_id)
+        welcomer.handle_welcome_channel_message.assert_called()
+        args = welcomer.handle_welcome_channel_message.call_args[1]
+        assert args['message'].content == message.content
+        assert len(args['guest_role_ids']) == 2
+        assert guest_role_id_1 in args['guest_role_ids']
+        assert guest_role_id_2 in args['guest_role_ids']
     else:
         welcomer.handle_welcome_channel_message.assert_not_called()
 
