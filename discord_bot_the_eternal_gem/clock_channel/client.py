@@ -12,6 +12,7 @@ class ClockChannelClient(discord.Client):
         super().__init__(**options)
         self.clock_channel_id = clock_channel_id
         self.exit_gracefully = False
+        self.failed_tries = 0
 
     async def on_ready(self):
         log.info(f"We have logged in as {self.user}")
@@ -21,8 +22,16 @@ class ClockChannelClient(discord.Client):
 
     async def update_loop(self):
         while not self.exit_gracefully:
-            await self.wait_until_next_update_time()
-            await self.update_channel_name()
+            try:
+                await self.wait_until_next_update_time()
+                await self.update_channel_name()
+
+                self.failed_tries = 0
+            except Exception as e:
+                log.exception(f"Error while updating clock channel, failed {self.failed_tries} in a row", exc_info=e)
+                self.failed_tries += 1
+                sleep_time = 2 ** min(self.failed_tries, 8)
+                await asyncio.sleep(sleep_time)
 
     async def wait_until_next_update_time(self):
         sleep_time = 30
