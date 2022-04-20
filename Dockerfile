@@ -1,7 +1,8 @@
-FROM python:3.10-slim
+FROM python:3-slim
 
 RUN pip install poetry
 RUN poetry config virtualenvs.create false
+RUN apt-get update && apt-get -y install gcc
 
 WORKDIR /app
 

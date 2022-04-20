@@ -45,3 +45,6 @@ jobs:
 
     - name: Lint with flake8
       run: poetry run flake8 tests discord_bot_the_eternal_gem
+
+    - name: Build the image
+      run: make image
